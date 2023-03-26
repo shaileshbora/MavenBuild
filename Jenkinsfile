@@ -1,33 +1,23 @@
-pipeline {
-	agent any
-	//def sonarHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+node()(
+	def sonarHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 	
-	tools {
-		maven "M2_HOME"
-	}
-	
-	stages {
 		stage('Code Checkout'){
-			steps {
-				git 'https://github.com/shaileshbora/MavenBuild.git'
-			}
+		checkout changelog: false, poll: false, scm: scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'GitHubCreds', url: 'https://github.com/anujdevopslearn/MavenBuild']])
 		}
-		//checkout changelog: false, poll: false, scm: scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'GitHubCreds', url: 'https://github.com/anujdevopslearn/MavenBuild']])
-		//}
 		stage('Package'){
-		//sh """
-		//	ls -lart
+		sh """
+			ls -lart
 			mvn clean package
-		//	ls -lart target
+			ls -lart target
 
-		//"""
+		"""
 		}
 	
-		//stage('Code Scan'){
-		//withSonarQubeEnv(credentialsId: 'SonarQubeCreds') {
-		//	sh "${sonarHome}/bin/sonar-scanner"
-		//}
-		//}
+		stage('Code Scan'){
+		withSonarQubeEnv(credentialsId: 'SonarQubeCreds') {
+			sh "${sonarHome}/bin/sonar-scanner"
+		}
+		}
 	
 		stage('Code Deployment'){
 			deploy adapters: [tomcat9(credentialsId: 'TomcatCreds', path: '', url: 'http://3.109.143.48:8080/')], contextPath: 'counterwebapp', onFailure: false, war: 'target/*.war'
