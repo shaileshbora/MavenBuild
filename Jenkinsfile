@@ -22,6 +22,6 @@ node(){
 	}
 	
 	stage('Code Deployment'){
-		deploy adapters: [tomcat9(credentialsId: 'TomcatCreds', path: '', url: 'http://3.109.143.48:8080/')], contextPath: 'Webapp', onFailure: false, war: 'target/*.war'
+		deploy adapters: [tomcat9(credentialsId: 'TomcatCreds', path: '', url: 'http://3.109.143.48:8080/')], contextPath: 'counterwebapp', onFailure: false, war: 'target/*.war'
 	}
 }
